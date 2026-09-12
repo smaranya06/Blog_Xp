@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#bg6)" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+  
+  <!-- Shoulders & Clothes -->
+  <path d="M22 108 C22 88, 38 82, 60 82 C82 82, 98 88, 98 108 Z" fill="#047857" />
+  <path d="M52 82 L60 96 L68 82" fill="#ffffff" />
+  
+  <!-- Neck -->
+  <rect x="53" y="66" width="14" height="18" rx="4" fill="#fed7aa" />
+  
+  <!-- Face -->
+  <ellipse cx="60" cy="54" rx="20" ry="23" fill="#fed7aa" />
+  
+  <!-- Ears -->
+  <circle cx="39" cy="54" r="5" fill="#fed7aa" />
+  <circle cx="81" cy="54" r="5" fill="#fed7aa" />
+  
+  <!-- Short Spiky Hair -->
+  <path d="M38 46 C36 28, 48 24, 60 22 C72 24, 84 28, 82 46 C77 41, 71 39, 65 39 C59 39, 54 36, 48 38 C42 40, 39 44, 38 46 Z" fill="#0f172a" />
+  
+  <!-- Sleek Rectangular Glasses -->
+  <rect x="44" y="48" width="14" height="10" rx="3" stroke="#0f172a" stroke-width="2" fill="rgba(255,255,255,0.25)" />
+  <rect x="62" y="48" width="14" height="10" rx="3" stroke="#0f172a" stroke-width="2" fill="rgba(255,255,255,0.25)" />
+  <line x1="58" y1="53" x2="62" y2="53" stroke="#0f172a" stroke-width="2" />
+  
+  <!-- Eyes -->
+  <circle cx="51" cy="53" r="2" fill="#0f172a" />
+  <circle cx="69" cy="53" r="2" fill="#0f172a" />
+  
+  <!-- Eyebrows -->
+  <path d="M44 44 Q51 42 58 44" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" fill="none" />
+  <path d="M62 44 Q69 42 76 44" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" fill="none" />
+  
+  <!-- Confident Smile -->
+  <path d="M53 64 Q60 69 67 64" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" fill="none" />
+</svg>

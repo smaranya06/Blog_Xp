@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#bg3)" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+  
+  <!-- Shoulders & Clothes -->
+  <path d="M22 108 C22 88, 38 82, 60 82 C82 82, 98 88, 98 108 Z" fill="#0f172a" />
+  <path d="M50 82 L60 92 L70 82" fill="#38bdf8" />
+  
+  <!-- Neck -->
+  <rect x="53" y="66" width="14" height="18" rx="4" fill="#fed7aa" />
+  
+  <!-- Face -->
+  <ellipse cx="60" cy="56" rx="20" ry="22" fill="#fed7aa" />
+  
+  <!-- Ears -->
+  <circle cx="39" cy="56" r="5" fill="#fed7aa" />
+  <circle cx="81" cy="56" r="5" fill="#fed7aa" />
+  
+  <!-- Beanie / Cap -->
+  <path d="M38 48 C38 27, 44 23, 60 23 C76 23, 82 27, 82 48 Z" fill="#0284c7" />
+  <rect x="36" y="44" width="48" height="8" rx="4" fill="#0369a1" />
+  
+  <!-- Hair peeking out -->
+  <path d="M38 52 C37 57, 41 60, 42 55" fill="#1e293b" />
+  <path d="M82 52 C83 57, 79 60, 78 55" fill="#1e293b" />
+  
+  <!-- Round Glasses -->
+  <circle cx="51" cy="55" r="7.5" stroke="#1e293b" stroke-width="2" fill="rgba(255,255,255,0.25)" />
+  <circle cx="69" cy="55" r="7.5" stroke="#1e293b" stroke-width="2" fill="rgba(255,255,255,0.25)" />
+  <line x1="58.5" y1="55" x2="61.5" y2="55" stroke="#1e293b" stroke-width="2" />
+  
+  <!-- Eyes behind glasses -->
+  <circle cx="51" cy="55" r="2" fill="#0f172a" />
+  <circle cx="69" cy="55" r="2" fill="#0f172a" />
+  
+  <!-- Friendly Smirk / Smile -->
+  <path d="M55 67 Q60 70 66 66" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" fill="none" />
+</svg>

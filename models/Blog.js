@@ -37,6 +37,15 @@ const blogSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    mediaUrl: {
+      type: String,
+      default: null,
+    },
+    mediaType: {
+      type: String,
+      enum: ['image', 'video', 'none'],
+      default: 'none',
+    },
   },
   {
     timestamps: true, // Automatically manages createdAt and updatedAt

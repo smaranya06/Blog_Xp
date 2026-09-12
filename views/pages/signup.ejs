@@ -1,0 +1,273 @@
+<%- include('../partials/header', { title: 'Sign Up' }) %>
+  <%- include('../partials/navbar') %>
+
+    <main class="main-content container">
+      <div class="auth-wrapper">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="auth-brand-badge">✦</div>
+            <h1 class="form-title">Create an Account</h1>
+            <p class="form-subtitle">Join Blog_Xp to write and share your developer journey</p>
+          </div>
+
+          <% if (typeof error !=='undefined' && error) { %>
+            <div class="alert alert-danger">
+              <%= error %>
+            </div>
+            <% } %>
+
+              <form action="/auth/signup" method="POST" enctype="multipart/form-data">
+                <!-- Profile Avatar Section -->
+                <div class="form-group avatar-upload-group">
+                  <label class="form-label">Profile Image <span class="badge-optional">(Optional)</span></label>
+
+                  <div class="avatar-picker-wrap">
+                    <div class="avatar-preview-box">
+                      <div class="avatar-preview-container">
+                        <img id="avatarPreview" src="/images/default-avatar.svg" alt="Avatar Preview"
+                          class="avatar-preview-img" />
+                        <button type="button" id="btnRemoveAvatar" class="btn-remove-avatar"
+                          title="Remove uploaded photo" aria-label="Remove uploaded photo">
+                          ✕
+                        </button>
+                      </div>
+
+                      <!-- Interactive Choose Avatar Pill Trigger (Visible when NO custom photo is uploaded) -->
+                      <button type="button" id="btnOpenAvatarModal" class="avatar-select-pill"
+                        title="Click to choose from default avatars">
+                        <span id="avatarPillText">Default Avatar</span>
+                        <span class="avatar-pill-chevron">▾</span>
+                      </button>
+
+                      <!-- Custom Photo Badge (Visible ONLY when user uploaded their own image) -->
+                      <span id="customPhotoBadge" class="avatar-badge-tag is-custom" style="display: none;">Custom
+                        Photo</span>
+                    </div>
+
+                    <div class="avatar-upload-inputs">
+                      <label for="profileImage" class="btn btn-secondary btn-sm file-picker-btn">
+                        📸 Upload Custom Photo
+                      </label>
+                      <input type="file" id="profileImage" name="profileImage"
+                        accept="image/png, image/jpeg, image/webp, image/gif, image/svg+xml"
+                        class="file-input-hidden" />
+                      <span id="fileNameDisplay" class="file-name-hint">No file chosen (Default avatar will be
+                        used)</span>
+                    </div>
+                  </div>
+
+                  <!-- Hidden Input for Chosen SVG Avatar -->
+                  <input type="hidden" name="selectedAvatar" id="selectedAvatar" value="/images/default-avatar.svg" />
+
+                  <div class="form-help">Upload your own photo (JPG, PNG, WebP) or click <strong>Default Avatar
+                      ▾</strong> to pick an avatar.</div>
+                </div>
+
+                <!-- Username Input -->
+                <div class="form-group">
+                  <label for="username" class="form-label">Username</label>
+                  <input type="text" id="username" name="username" class="form-control" placeholder="e.g., alex_codes"
+                    value="<%= typeof username !== 'undefined' ? username : '' %>" required minlength="3" maxlength="30"
+                    autocomplete="username" />
+                  <div class="form-help">Must be between 3 and 30 characters.</div>
+                </div>
+
+                <!-- Email Input -->
+                <div class="form-group">
+                  <label for="email" class="form-label">Email Address</label>
+                  <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com"
+                    value="<%= typeof email !== 'undefined' ? email : '' %>" required autocomplete="email" />
+                </div>
+
+                <!-- Password Input -->
+                <div class="form-group">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" id="password" name="password" class="form-control"
+                    placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password" />
+                  <div class="form-help">Must be at least 6 characters.</div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary"
+                  style="width: 100%; margin-top: 0.75rem; padding: 0.8rem; font-size: 1rem;">
+                  Get Started &rarr;
+                </button>
+              </form>
+
+              <div class="form-footer-link">
+                Already registered? <a href="/auth/login"><strong>Log in to your account</strong></a>
+              </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Avatar Selection Popup Modal (Top-level fixed overlay) -->
+    <div class="avatar-modal-overlay" id="avatarModal" style="display: none;" role="dialog"
+      aria-modal="true" aria-labelledby="avatarModalTitle">
+      <div class="avatar-modal-card">
+        <div class="avatar-modal-header">
+          <div class="avatar-modal-header-content">
+            <h3 class="avatar-modal-title" id="avatarModalTitle">Choose an Avatar</h3>
+            <p class="avatar-modal-desc">Select an avatar or keep the default silhouette</p>
+          </div>
+          <button type="button" class="avatar-modal-close" id="btnCloseAvatarModal"
+            aria-label="Close avatar picker">✕</button>
+        </div>
+
+        <div class="avatar-modal-grid" id="avatarModalGrid">
+          <div class="avatar-option-card is-active" data-avatar="/images/default-avatar.svg" title="Default Silhouette">
+            <img src="/images/default-avatar.svg" alt="Default Silhouette" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-1.svg" title="Avatar 1">
+            <img src="/images/avatars/face-1.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-2.svg" title="Avatar 2">
+            <img src="/images/avatars/face-2.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-3.svg" title="Avatar 3">
+            <img src="/images/avatars/face-3.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-4.svg" title="Avatar 4">
+            <img src="/images/avatars/face-4.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-5.svg" title="Avatar 5">
+            <img src="/images/avatars/face-5.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-6.svg" title="Avatar 6">
+            <img src="/images/avatars/face-6.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-7.svg" title="Avatar 7">
+            <img src="/images/avatars/face-7.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+          <div class="avatar-option-card" data-avatar="/images/avatars/face-8.svg" title="Avatar 8">
+            <img src="/images/avatars/face-8.svg" alt="Avatar option" class="avatar-option-thumb" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        function setupAvatarPicker() {
+          const fileInput = document.getElementById('profileImage');
+          const previewImg = document.getElementById('avatarPreview');
+          const fileNameDisplay = document.getElementById('fileNameDisplay');
+          const btnRemoveAvatar = document.getElementById('btnRemoveAvatar');
+          const btnOpenAvatarModal = document.getElementById('btnOpenAvatarModal');
+          const avatarPillText = document.getElementById('avatarPillText');
+          const customPhotoBadge = document.getElementById('customPhotoBadge');
+          const selectedAvatarInput = document.getElementById('selectedAvatar');
+          const avatarModal = document.getElementById('avatarModal');
+          const btnCloseAvatarModal = document.getElementById('btnCloseAvatarModal');
+          const avatarOptionCards = document.querySelectorAll('.avatar-option-card');
+
+          if (!avatarModal || !btnOpenAvatarModal) return;
+
+          let currentSvgAvatar = (selectedAvatarInput && selectedAvatarInput.value) || '/images/default-avatar.svg';
+
+          // Open Modal
+          function openModal() {
+            avatarModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+          }
+
+          // Close Modal
+          function closeModal() {
+            avatarModal.style.display = 'none';
+            document.body.style.overflow = '';
+          }
+
+          btnOpenAvatarModal.addEventListener('click', openModal);
+          if (previewImg) {
+            previewImg.addEventListener('click', function () {
+              // If user hasn't uploaded custom photo, clicking avatar preview also opens modal
+              if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                openModal();
+              }
+            });
+          }
+          if (btnCloseAvatarModal) {
+            btnCloseAvatarModal.addEventListener('click', closeModal);
+          }
+          avatarModal.addEventListener('click', function (e) {
+            if (e.target === avatarModal) {
+              closeModal();
+            }
+          });
+          document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && avatarModal.style.display === 'flex') {
+              closeModal();
+            }
+          });
+
+          // Avatar Card Selection Handler
+          avatarOptionCards.forEach(function (card) {
+            card.addEventListener('click', function () {
+              const chosenAvatar = this.dataset.avatar;
+
+              currentSvgAvatar = chosenAvatar;
+              if (selectedAvatarInput) selectedAvatarInput.value = chosenAvatar;
+
+              if (previewImg) previewImg.src = chosenAvatar;
+              if (avatarPillText) avatarPillText.textContent = 'Default Avatar';
+              if (fileNameDisplay) fileNameDisplay.textContent = 'Avatar selected (Default avatar will be used)';
+
+              avatarOptionCards.forEach(function (c) {
+                c.classList.remove('is-active');
+              });
+              this.classList.add('is-active');
+
+              closeModal();
+            });
+          });
+
+          // Remove Custom Photo
+          function removeCustomPhoto() {
+            if (fileInput) fileInput.value = '';
+            if (btnRemoveAvatar) btnRemoveAvatar.classList.remove('is-visible');
+            if (customPhotoBadge) customPhotoBadge.style.display = 'none';
+            if (btnOpenAvatarModal) btnOpenAvatarModal.style.display = 'inline-flex';
+
+            if (previewImg) previewImg.src = currentSvgAvatar;
+            if (fileNameDisplay) fileNameDisplay.textContent = 'Custom photo removed. Using default avatar.';
+          }
+
+          // Custom Photo File Handler
+          if (fileInput) {
+            fileInput.addEventListener('change', function (e) {
+              const file = e.target.files && e.target.files[0];
+              if (file) {
+                const sizeKB = (file.size / 1024).toFixed(1);
+                if (fileNameDisplay) fileNameDisplay.textContent = file.name + ' (' + sizeKB + ' KB)';
+                if (btnRemoveAvatar) btnRemoveAvatar.classList.add('is-visible');
+
+                // Hide popup select option while user has uploaded their own image
+                if (btnOpenAvatarModal) btnOpenAvatarModal.style.display = 'none';
+                if (customPhotoBadge) customPhotoBadge.style.display = 'inline-flex';
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                  if (previewImg) previewImg.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+              } else {
+                removeCustomPhoto();
+              }
+            });
+          }
+
+          // Cross Button Click Handler
+          if (btnRemoveAvatar) {
+            btnRemoveAvatar.addEventListener('click', removeCustomPhoto);
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setupAvatarPicker);
+        } else {
+          setupAvatarPicker();
+        }
+      })();
+    </script>
+
+    <%- include('../partials/footer') %>

@@ -66,6 +66,7 @@ const register = async (req, res) => {
       username,
       email: email.toLowerCase(),
       password,
+      profileImage: req.body.profileImage || '/images/default-avatar.svg',
     });
 
     // 6. Return response with signed JWT and HTTP-Only cookie

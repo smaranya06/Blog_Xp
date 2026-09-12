@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    profileImage: {
+      type: String,
+      default: '/images/default-avatar.svg',
+    },
   },
   {
     timestamps: true, // Automatically records createdAt and updatedAt timestamps

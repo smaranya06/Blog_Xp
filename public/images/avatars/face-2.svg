@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#bg2)" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+  
+  <!-- Shoulders & Clothes -->
+  <path d="M22 108 C22 88, 38 82, 60 82 C82 82, 98 88, 98 108 Z" fill="#f43f5e" />
+  <path d="M46 84 C46 96, 74 96, 74 84" fill="#fb7185" />
+  
+  <!-- Neck -->
+  <rect x="53" y="66" width="14" height="18" rx="4" fill="#fbcfe8" />
+  
+  <!-- Face -->
+  <ellipse cx="60" cy="54" rx="20" ry="23" fill="#fcd34d" />
+  
+  <!-- Ears & Hoop Earrings -->
+  <circle cx="39" cy="55" r="5" fill="#fcd34d" />
+  <circle cx="81" cy="55" r="5" fill="#fcd34d" />
+  <circle cx="38" cy="59" r="3.5" stroke="#f59e0b" stroke-width="1.8" fill="none" />
+  <circle cx="82" cy="59" r="3.5" stroke="#f59e0b" stroke-width="1.8" fill="none" />
+  
+  <!-- Big Curly / Wavy Hair Silhouette -->
+  <circle cx="43" cy="38" r="14" fill="#312e81" />
+  <circle cx="77" cy="38" r="14" fill="#312e81" />
+  <circle cx="60" cy="31" r="15" fill="#312e81" />
+  <circle cx="35" cy="50" r="11" fill="#312e81" />
+  <circle cx="85" cy="50" r="11" fill="#312e81" />
+  
+  <!-- Front Headband -->
+  <path d="M39 46 Q60 38 81 46" stroke="#fbbf24" stroke-width="5" stroke-linecap="round" fill="none" />
+  
+  <!-- Eyes -->
+  <ellipse cx="51" cy="53" rx="2.5" ry="3" fill="#0f172a" />
+  <ellipse cx="69" cy="53" rx="2.5" ry="3" fill="#0f172a" />
+  <circle cx="52" cy="52" r="0.8" fill="#ffffff" />
+  <circle cx="70" cy="52" r="0.8" fill="#ffffff" />
+  
+  <!-- Eyebrows -->
+  <path d="M47 48 Q51 45 55 48" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round" fill="none" />
+  <path d="M65 48 Q69 45 73 48" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round" fill="none" />
+  
+  <!-- Smile -->
+  <path d="M53 63 Q60 70 67 63" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" fill="none" />
+  <!-- Cheeks -->
+  <circle cx="46" cy="58" r="3.5" fill="#f43f5e" opacity="0.3" />
+  <circle cx="74" cy="58" r="3.5" fill="#f43f5e" opacity="0.3" />
+</svg>

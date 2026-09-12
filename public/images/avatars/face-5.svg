@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#bg5)" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+  
+  <!-- Flowing back hair -->
+  <path d="M30 50 C26 70, 32 90, 42 100 L78 100 C88 90, 94 70, 90 50 Z" fill="#451a03" />
+  
+  <!-- Shoulders & Clothes -->
+  <path d="M22 108 C22 88, 38 82, 60 82 C82 82, 98 88, 98 108 Z" fill="#14b8a6" />
+  <path d="M50 82 L60 92 L70 82" fill="#0f766e" />
+  
+  <!-- Neck -->
+  <rect x="53" y="66" width="14" height="18" rx="4" fill="#fdba74" />
+  
+  <!-- Face -->
+  <ellipse cx="60" cy="54" rx="19" ry="22" fill="#fed7aa" />
+  
+  <!-- Ears -->
+  <circle cx="40" cy="55" r="4.5" fill="#fed7aa" />
+  <circle cx="80" cy="55" r="4.5" fill="#fed7aa" />
+  <circle cx="40" cy="59" r="2.5" fill="#ec4899" />
+  <circle cx="80" cy="59" r="2.5" fill="#ec4899" />
+  
+  <!-- Hair front style -->
+  <path d="M38 46 C38 28, 52 24, 60 24 C72 24, 82 30, 82 48 C78 42, 70 38, 62 40 C52 42, 45 44, 38 46 Z" fill="#78350f" />
+  <path d="M36 46 C34 60, 38 72, 44 76 C41 68, 40 58, 40 48" fill="#78350f" />
+  <path d="M84 46 C86 60, 82 72, 76 76 C79 68, 80 58, 80 48" fill="#78350f" />
+  
+  <!-- Eyes -->
+  <ellipse cx="51" cy="52" rx="2.5" ry="3" fill="#0f172a" />
+  <ellipse cx="69" cy="52" rx="2.5" ry="3" fill="#0f172a" />
+  <circle cx="52" cy="51" r="0.8" fill="#ffffff" />
+  <circle cx="70" cy="51" r="0.8" fill="#ffffff" />
+  
+  <!-- Eyebrows -->
+  <path d="M47 46 Q51 43 55 46" stroke="#451a03" stroke-width="2" stroke-linecap="round" fill="none" />
+  <path d="M65 46 Q69 43 73 46" stroke="#451a03" stroke-width="2" stroke-linecap="round" fill="none" />
+  
+  <!-- Sweet Smile -->
+  <path d="M53 62 Q60 68 67 62" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" fill="none" />
+  <!-- Cheeks -->
+  <circle cx="46" cy="57" r="3.5" fill="#fb7185" opacity="0.3" />
+  <circle cx="74" cy="57" r="3.5" fill="#fb7185" opacity="0.3" />
+</svg>

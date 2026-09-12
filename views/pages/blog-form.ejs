@@ -1,0 +1,193 @@
+<%- include('../partials/header', { title: isEdit ? 'Edit Post' : 'Create New Post' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content container">
+  <div style="max-width: 780px; margin: 0 auto;">
+    <div style="margin-bottom: 1.5rem;">
+      <a href="<%= isEdit ? '/blogs/' + blog._id : '/' %>" class="read-more-link">&larr; Cancel and return</a>
+    </div>
+
+    <div class="form-card">
+      <div class="form-header" style="text-align: left; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+        <h1 class="form-title"><%= isEdit ? 'Edit Your Story' : 'Write a New Story' %></h1>
+        <p class="form-subtitle">Share your insights, lessons, and thoughts with the community.</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form action="<%= isEdit ? '/blogs/' + blog._id + '/edit' : '/blogs/create' %>" method="POST" enctype="multipart/form-data">
+        <!-- Post Title -->
+        <div class="form-group">
+          <label for="title" class="form-label">Article Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            class="form-control"
+            placeholder="e.g., Understanding Modern Asynchronous JavaScript"
+            value="<%= typeof blog !== 'undefined' && blog.title ? blog.title : '' %>"
+            required
+            maxlength="200"
+          />
+        </div>
+
+        <!-- Media Attachment (Image or Video) -->
+        <div class="form-group media-upload-group">
+          <label class="form-label">Blog Media <span class="badge-optional">(Image or Video - Optional)</span></label>
+          
+          <!-- Current Media if Editing -->
+          <% if (typeof isEdit !== 'undefined' && isEdit && blog.mediaUrl && blog.mediaType && blog.mediaType !== 'none' && String(blog.mediaUrl).trim() !== '') { %>
+            <div class="current-media-card" id="currentMediaCard">
+              <div class="current-media-header">
+                <span class="media-type-pill">Current <%= blog.mediaType === 'video' ? '🎬 Video' : '🖼️ Image' %></span>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="removeMedia" value="true" id="removeMediaCheckbox" />
+                  <span>Remove Media</span>
+                </label>
+              </div>
+              <div class="current-media-preview">
+                <% if (blog.mediaType === 'video') { %>
+                  <video src="<%= blog.mediaUrl %>" controls class="form-media-preview-video"></video>
+                <% } else { %>
+                  <img src="<%= blog.mediaUrl %>" alt="Current Media" class="form-media-preview-img" />
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+
+          <div class="media-dropzone">
+            <div class="dropzone-content">
+              <span class="dropzone-icon">📁</span>
+              <div class="dropzone-text">
+                <strong>Click to choose or replace media</strong>
+                <span>Supports JPG, PNG, WebP, GIF, MP4, WebM (Max 60MB)</span>
+              </div>
+              <label for="blogMedia" class="btn btn-secondary btn-sm file-picker-btn">
+                Browse Files
+              </label>
+              <input
+                type="file"
+                id="blogMedia"
+                name="media"
+                accept="image/*,video/*"
+                class="file-input-hidden"
+              />
+            </div>
+            <!-- Live Preview Container for Newly Selected File -->
+            <div id="mediaPreviewContainer" class="media-preview-container" style="display: none;">
+              <div class="media-preview-bar">
+                <span id="mediaTypeBadge" class="badge-pill">New File</span>
+                <span id="mediaFileName" class="media-file-name"></span>
+                <button type="button" id="clearMediaBtn" class="btn-clear-media" title="Remove">&times;</button>
+              </div>
+              <div id="mediaPreviewContent" class="media-preview-content"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+          <label for="tags" class="form-label">Tags (comma-separated)</label>
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            class="form-control"
+            placeholder="e.g., javascript, webdev, nodejs"
+            value="<%= typeof blog !== 'undefined' && blog.tags ? blog.tags.join(', ') : '' %>"
+          />
+          <div class="form-help">Separate tags with commas. Helps readers discover your article.</div>
+        </div>
+
+        <!-- Content Body -->
+        <div class="form-group">
+          <label for="content" class="form-label">Article Content</label>
+          <textarea
+            id="content"
+            name="content"
+            class="form-control"
+            rows="12"
+            placeholder="Write your article content here..."
+            required
+          ><%= typeof blog !== 'undefined' && blog.content ? blog.content : '' %></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions" style="display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+          <a href="<%= isEdit ? '/blogs/' + blog._id : '/' %>" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            <%= isEdit ? 'Save Changes' : 'Publish Story' %>
+          </button>
+        </div>
+      </form>
+
+      <script>
+        const mediaInput = document.getElementById('blogMedia');
+        const previewContainer = document.getElementById('mediaPreviewContainer');
+        const previewContent = document.getElementById('mediaPreviewContent');
+        const mediaTypeBadge = document.getElementById('mediaTypeBadge');
+        const mediaFileName = document.getElementById('mediaFileName');
+        const clearBtn = document.getElementById('clearMediaBtn');
+        const currentMediaCard = document.getElementById('currentMediaCard');
+        const removeMediaCheckbox = document.getElementById('removeMediaCheckbox');
+
+        if (mediaInput) {
+          mediaInput.addEventListener('change', function (e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            mediaFileName.textContent = file.name + ' (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+            const isVideo = file.type.startsWith('video/');
+            mediaTypeBadge.textContent = isVideo ? '🎬 Video' : '🖼️ Image';
+
+            previewContent.innerHTML = '';
+            const fileUrl = URL.createObjectURL(file);
+
+            if (isVideo) {
+              const video = document.createElement('video');
+              video.src = fileUrl;
+              video.controls = true;
+              video.className = 'form-media-preview-video';
+              previewContent.appendChild(video);
+            } else {
+              const img = document.createElement('img');
+              img.src = fileUrl;
+              img.alt = 'Uploaded media preview';
+              img.className = 'form-media-preview-img';
+              previewContent.appendChild(img);
+            }
+
+            previewContainer.style.display = 'block';
+
+            // If replacing existing media, uncheck removeMedia checkbox
+            if (removeMediaCheckbox) {
+              removeMediaCheckbox.checked = false;
+            }
+          });
+        }
+
+        if (clearBtn) {
+          clearBtn.addEventListener('click', function () {
+            mediaInput.value = '';
+            previewContent.innerHTML = '';
+            previewContainer.style.display = 'none';
+          });
+        }
+
+        if (removeMediaCheckbox && currentMediaCard) {
+          removeMediaCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+              currentMediaCard.style.opacity = '0.35';
+            } else {
+              currentMediaCard.style.opacity = '1';
+            }
+          });
+        }
+      </script>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

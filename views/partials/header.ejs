@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Blog_Xp - A clean, modern server-rendered blogging platform built with Express and EJS.">
+  <title><%= typeof title !== 'undefined' ? title + ' | Blog_Xp' : 'Blog_Xp - Modern Blog Platform' %></title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Theme Init Script (Prevents flash of wrong theme) -->
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('blog_xp_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      } catch (e) {}
+    })();
+  </script>
+  <!-- Auth Pages Refresh Redirect: If user refreshes on login or signup, redirect to '/' -->
+  <script>
+    (function () {
+      try {
+        var path = window.location.pathname.replace(/\/+$/, '');
+        var isAuthPage = (path === '/auth/login' || path === '/auth/signup' || path === '/login' || path === '/signup');
+        if (isAuthPage && window.performance) {
+          var isReload = false;
+          var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+          if (navEntries && navEntries.length > 0) {
+            isReload = (navEntries[0].type === 'reload');
+          } else if (performance.navigation) {
+            isReload = (performance.navigation.type === 1);
+          }
+          if (isReload) {
+            window.location.replace('/');
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>

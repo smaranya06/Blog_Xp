@@ -1,0 +1,194 @@
+<header class="navbar">
+  <div class="nav-container nav-wrapper">
+    <a href="/" class="brand-logo">
+      <span class="brand-icon">✦</span> Blog_Xp
+    </a>
+
+    <div class="nav-actions">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/my-blogs" class="btn btn-secondary btn-sm nav-myblogs-btn">My Blogs</a>
+        <a href="/blogs/create" class="btn btn-primary btn-sm">+ Write Post</a>
+
+        <!-- User Profile Dropdown (Right-aligned) -->
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <button type="button" class="nav-user-btn" id="navUserBtn" aria-expanded="false" aria-haspopup="true">
+            <img
+              src="<%= (user.profileImage) ? user.profileImage : '/images/default-avatar.svg' %>"
+              alt="<%= user.username %>"
+              class="nav-user-avatar"
+            />
+            <span class="nav-username"><%= user.username %></span>
+            <span class="nav-user-chevron">▾</span>
+          </button>
+
+          <div class="nav-dropdown-menu" id="navDropdownMenu">
+            <div class="nav-dropdown-header">
+              <span class="nav-dropdown-name"><%= user.username %></span>
+              <span class="nav-dropdown-email"><%= user.email %></span>
+            </div>
+            <div class="nav-dropdown-divider"></div>
+            <a href="/my-blogs" class="nav-dropdown-item">
+              <span class="nav-dropdown-icon">📚</span>
+              <span>My Blogs</span>
+            </a>
+            <!-- Settings with Account Details Submenu Popup -->
+            <div class="nav-dropdown-submenu-wrap" id="navSettingsSubmenuWrap">
+              <div class="nav-dropdown-item nav-submenu-trigger" id="navSettingsTrigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                <span class="nav-dropdown-icon">⚙️</span>
+                <span class="nav-submenu-text">Settings</span>
+                <span class="nav-submenu-arrow">▾</span>
+              </div>
+              <div class="nav-submenu-popup" id="navSettingsPopup">
+                <a href="/settings" class="nav-submenu-item" id="navAccountDetailsLink">
+                  <span class="nav-dropdown-icon">👤</span>
+                  <span>Account Details</span>
+                </a>
+                <div class="nav-submenu-item nav-theme-toggle-item" id="navThemeToggleItem" role="button" tabindex="0" title="Click to toggle Dark / Light mode">
+                  <span class="nav-dropdown-icon" id="navThemeIcon">🌙</span>
+                  <span id="navThemeLabel">Dark Mode</span>
+                  <div class="toggle-switch-sm is-dark" id="navThemeToggleSwitch">
+                    <span class="toggle-slider-sm"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="nav-dropdown-divider"></div>
+            <a href="/auth/logout" class="nav-dropdown-item nav-dropdown-logout">
+              <span class="nav-dropdown-icon">🚪</span>
+              <span>Log Out</span>
+            </a>
+          </div>
+        </div>
+
+        <script>
+          (function () {
+            const dropdown = document.getElementById('navUserDropdown');
+            const btn = document.getElementById('navUserBtn');
+            const settingsWrap = document.getElementById('navSettingsSubmenuWrap');
+            const settingsTrigger = document.getElementById('navSettingsTrigger');
+
+            if (btn && dropdown) {
+              btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('is-open');
+                const isOpen = dropdown.classList.contains('is-open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                if (!isOpen && settingsWrap) {
+                  settingsWrap.classList.remove('is-open');
+                }
+              });
+            }
+
+            if (settingsTrigger && settingsWrap) {
+              settingsTrigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                settingsWrap.classList.toggle('is-open');
+                const isOpen = settingsWrap.classList.contains('is-open');
+                settingsTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+              });
+            }
+
+            document.addEventListener('click', function (e) {
+              if (dropdown && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('is-open');
+                btn.setAttribute('aria-expanded', 'false');
+                if (settingsWrap) settingsWrap.classList.remove('is-open');
+              }
+            });
+
+            document.addEventListener('keydown', function (e) {
+              if (e.key === 'Escape') {
+                if (settingsWrap && settingsWrap.classList.contains('is-open')) {
+                  settingsWrap.classList.remove('is-open');
+                } else if (dropdown && dropdown.classList.contains('is-open')) {
+                  dropdown.classList.remove('is-open');
+                  btn.setAttribute('aria-expanded', 'false');
+                }
+              }
+            });
+          })();
+        </script>
+      <% } else { %>
+        <div class="nav-guest-theme-toggle" id="navGuestThemeBtn" role="button" tabindex="0" title="Toggle Dark / Light mode" style="cursor: pointer; padding: 0.35rem 0.65rem; font-size: 1rem; border-radius: 9999px; background: rgba(255,255,255,0.06); border: 1px solid var(--color-border); display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+          <span id="guestThemeIcon">🌙</span>
+        </div>
+        <a href="/auth/login" class="btn btn-secondary btn-sm">Log In</a>
+        <a href="/auth/signup" class="btn btn-primary btn-sm">Sign Up</a>
+      <% } %>
+    </div>
+  </div>
+</header>
+
+<!-- Global Theme Synchronization Script -->
+<script>
+  (function () {
+    function getSavedTheme() {
+      try {
+        return localStorage.getItem('blog_xp_theme') || 'dark';
+      } catch (e) {
+        return 'dark';
+      }
+    }
+
+    function applyTheme(theme) {
+      const isDark = (theme === 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+      try {
+        localStorage.setItem('blog_xp_theme', theme);
+      } catch (e) {}
+
+      // 1. Navbar Submenu Toggle
+      const navIcon = document.getElementById('navThemeIcon');
+      const navLabel = document.getElementById('navThemeLabel');
+      const navSwitch = document.getElementById('navThemeToggleSwitch');
+      if (navIcon) navIcon.textContent = isDark ? '🌙' : '☀️';
+      if (navLabel) navLabel.textContent = isDark ? 'Dark Mode: On' : 'Dark Mode: Off';
+      if (navSwitch) {
+        if (isDark) navSwitch.classList.add('is-dark');
+        else navSwitch.classList.remove('is-dark');
+      }
+
+      // 2. Guest Theme Toggle
+      const guestIcon = document.getElementById('guestThemeIcon');
+      if (guestIcon) guestIcon.textContent = isDark ? '🌙' : '☀️';
+
+      // 3. Settings Page Toggle
+      const pageCheckbox = document.getElementById('pageThemeCheckbox');
+      const pageText = document.getElementById('pageThemeText');
+      const pageIcon = document.getElementById('pageThemeIcon');
+      if (pageCheckbox) pageCheckbox.checked = isDark;
+      if (pageText) pageText.textContent = isDark ? 'On' : 'Off';
+      if (pageIcon) pageIcon.textContent = isDark ? '🌙' : '☀️';
+    }
+
+    function toggleTheme() {
+      const current = getSavedTheme();
+      const next = (current === 'dark') ? 'light' : 'dark';
+      applyTheme(next);
+    }
+
+    // Attach listeners
+    const navThemeItem = document.getElementById('navThemeToggleItem');
+    if (navThemeItem) {
+      navThemeItem.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleTheme();
+      });
+    }
+
+    const guestThemeBtn = document.getElementById('navGuestThemeBtn');
+    if (guestThemeBtn) {
+      guestThemeBtn.addEventListener('click', toggleTheme);
+    }
+
+    const pageThemeCheckbox = document.getElementById('pageThemeCheckbox');
+    if (pageThemeCheckbox) {
+      pageThemeCheckbox.addEventListener('change', function () {
+        applyTheme(this.checked ? 'dark' : 'light');
+      });
+    }
+
+    // Initialize state
+    applyTheme(getSavedTheme());
+  })();
+</script>

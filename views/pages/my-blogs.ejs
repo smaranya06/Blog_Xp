@@ -1,0 +1,160 @@
+<%- include('../partials/header', { title: 'My Stories - Blog_Xp' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content container">
+  <!-- Notifications & Status Banners -->
+  <% if (typeof deleted !== 'undefined' && deleted) { %>
+    <div class="alert alert-success flash-alert" id="deletedAlert" role="alert">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span>✓</span>
+        <span>Story was successfully deleted.</span>
+      </div>
+      <button type="button" class="alert-dismiss-btn" onclick="dismissDeletedAlert()" aria-label="Dismiss notification">✕</button>
+    </div>
+
+    <script>
+      (function() {
+        if (window.history && window.history.replaceState) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('deleted');
+          const cleanUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '');
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+
+        window.dismissDeletedAlert = function() {
+          const alertEl = document.getElementById('deletedAlert');
+          if (alertEl) {
+            alertEl.classList.add('is-hiding');
+            setTimeout(function() {
+              if (alertEl && alertEl.parentNode) {
+                alertEl.parentNode.removeChild(alertEl);
+              }
+            }, 350);
+          }
+        };
+      })();
+    </script>
+  <% } %>
+
+  <!-- My Blogs Dashboard Header -->
+  <section class="my-blogs-hero">
+    <div class="my-blogs-hero-content">
+      <div class="my-blogs-author-pill">
+        <img
+          src="<%= (user && user.profileImage) ? user.profileImage : '/images/default-avatar.svg' %>"
+          alt="<%= user ? user.username : 'You' %>"
+          class="my-blogs-author-avatar"
+        />
+        <span>Author Dashboard &bull; @<%= user ? user.username : 'User' %></span>
+      </div>
+      <h1 class="my-blogs-title">My Published Stories</h1>
+      <p class="my-blogs-subtitle">
+        Review, edit, or delete any of the articles you have created on Blog_Xp.
+      </p>
+    </div>
+
+    <div class="my-blogs-actions-top">
+      <a href="/blogs/create" class="btn btn-primary">+ Write New Story</a>
+    </div>
+  </section>
+
+  <!-- Filter / Count Bar -->
+  <div class="filter-bar">
+    <h2 class="filter-heading">
+      <span>Your Articles</span>
+    </h2>
+    <span style="font-size: 0.9rem; color: var(--color-text-subtle); font-weight: 500;">
+      <%= blogs.length %> <%= blogs.length === 1 ? 'story' : 'stories' %> total
+    </span>
+  </div>
+
+  <!-- Blog Cards Grid with Management Controls -->
+  <% if (blogs && blogs.length > 0) { %>
+    <div class="blog-grid">
+      <% blogs.forEach(function(blog) { %>
+        <% const hasMedia = blog.mediaUrl && blog.mediaType && blog.mediaType !== 'none' && String(blog.mediaUrl).trim() !== ''; %>
+        <article class="blog-card <%= hasMedia ? 'has-media' : 'no-media' %> my-blog-card">
+          <% if (hasMedia) { %>
+            <div class="blog-card-media-wrap">
+              <a href="/blogs/<%= blog._id %>" class="blog-card-media-link" tabindex="-1" aria-label="View <%= blog.title %>">
+                <% if (blog.mediaType === 'video') { %>
+                  <div class="blog-card-video-thumb">
+                    <video src="<%= blog.mediaUrl %>" muted preload="metadata" class="blog-card-media-video"></video>
+                    <span class="video-play-indicator">▶ Video</span>
+                  </div>
+                <% } else { %>
+                  <img src="<%= blog.mediaUrl %>" alt="<%= blog.title %>" class="blog-card-media-img" loading="lazy" />
+                <% } %>
+              </a>
+            </div>
+          <% } %>
+
+          <div class="blog-card-meta">
+            <div class="blog-card-author">
+              <img
+                src="<%= (blog.author && blog.author.profileImage) ? blog.author.profileImage : '/images/default-avatar.svg' %>"
+                alt="<%= blog.author ? blog.author.username : 'Author' %>"
+                class="author-avatar-sm"
+                loading="lazy"
+              />
+              <span class="author-name">@<%= blog.author ? blog.author.username : 'you' %></span>
+            </div>
+            <span>&bull;</span>
+            <time datetime="<%= blog.createdAt %>">
+              <%= new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+            </time>
+          </div>
+
+          <h3 class="blog-card-title">
+            <a href="/blogs/<%= blog._id %>"><%= blog.title %></a>
+          </h3>
+
+          <p class="blog-card-snippet">
+            <%= blog.snippet || (blog.content.length > 140 ? blog.content.substring(0, 140) + '...' : blog.content) %>
+          </p>
+
+          <% if (blog.tags && blog.tags.length > 0) { %>
+            <div class="blog-card-tags">
+              <% blog.tags.forEach(function(tagItem) { %>
+                <span class="tag-badge">#<%= tagItem %></span>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <!-- Author Management Controls -->
+          <div class="my-blog-manage-bar">
+            <a href="/blogs/<%= blog._id %>" class="read-more-link">View Story &rarr;</a>
+            
+            <div class="my-blog-button-group">
+              <a href="/blogs/<%= blog._id %>/edit" class="btn btn-secondary btn-sm btn-manage-edit" title="Edit this story">
+                ✏️ Edit
+              </a>
+              <form
+                action="/blogs/<%= blog._id %>/delete"
+                method="POST"
+                class="form-inline-delete"
+                onsubmit="return confirm('Are you sure you want to delete this story? This action cannot be undone.');"
+              >
+                <button type="submit" class="btn btn-danger btn-sm btn-manage-delete" title="Delete this story">
+                  🗑️ Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </article>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div style="font-size: 2.75rem; margin-bottom: 0.75rem;">📝</div>
+      <h3 class="empty-state-title">You haven't written any stories yet</h3>
+      <p class="empty-state-desc">
+        Share your technical discoveries, tutorials, insights, and journey with fellow developers.
+      </p>
+      <a href="/blogs/create" class="btn btn-primary">+ Write Your First Story</a>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

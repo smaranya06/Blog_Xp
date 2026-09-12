@@ -1,0 +1,71 @@
+<%- include('../partials/header', { title: blog.title }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content container">
+  <!-- Back navigation -->
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/" class="read-more-link">&larr; Back to all stories</a>
+  </div>
+
+  <article class="article-container">
+    <header class="article-header">
+      <h1 class="article-title"><%= blog.title %></h1>
+
+      <div class="article-meta-bar">
+        <div class="article-author-info">
+          <img
+            src="<%= (blog.author && blog.author.profileImage) ? blog.author.profileImage : '/images/default-avatar.svg' %>"
+            alt="<%= blog.author ? blog.author.username : 'Author' %>"
+            class="author-avatar-img"
+          />
+          <div class="author-meta-text">
+            <div class="author-meta-name"><%= blog.author ? blog.author.username : 'Unknown Writer' %></div>
+            <div class="author-meta-date">
+              Published on <%= new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <% if (blog.tags && blog.tags.length > 0) { %>
+        <div class="blog-card-tags" style="margin-top: 1.25rem; margin-bottom: 0;">
+          <% blog.tags.forEach(function(tagItem) { %>
+            <a href="/?tag=<%= encodeURIComponent(tagItem) %>" class="tag-badge">#<%= tagItem %></a>
+          <% }); %>
+        </div>
+      <% } %>
+    </header>
+
+    <!-- Article Media (Image or Video) -->
+    <% if (blog.mediaUrl && blog.mediaType && blog.mediaType !== 'none' && String(blog.mediaUrl).trim() !== '') { %>
+      <div class="article-media-container">
+        <% if (blog.mediaType === 'video') { %>
+          <video src="<%= blog.mediaUrl %>" controls class="article-media-video" preload="metadata"></video>
+        <% } else { %>
+          <img src="<%= blog.mediaUrl %>" alt="<%= blog.title %>" class="article-media-img" />
+        <% } %>
+      </div>
+    <% } %>
+
+    <!-- Article Content -->
+    <div class="article-body">
+      <%= blog.content %>
+    </div>
+
+    <!-- Article Bottom Navigation -->
+    <footer class="article-footer">
+      <div class="article-footer-author">
+        <img
+          src="<%= (blog.author && blog.author.profileImage) ? blog.author.profileImage : '/images/default-avatar.svg' %>"
+          alt="<%= blog.author ? blog.author.username : 'Author' %>"
+          class="author-avatar-sm"
+        />
+        <span>Written by <strong><%= blog.author ? blog.author.username : 'Community Author' %></strong></span>
+      </div>
+      <a href="/" class="btn btn-secondary btn-sm">&larr; Return to Feed</a>
+    </footer>
+  </article>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,463 @@
+<%- include('../partials/header', { title: 'Account Details - Blog_Xp' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content container">
+  <div class="auth-wrapper" style="max-width: 560px;">
+    <div class="form-card settings-card">
+
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success" style="margin-bottom: 1.5rem;">✓ <%= success %></div>
+      <% } %>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger" style="margin-bottom: 1.5rem;">✕ <%= error %></div>
+      <% } %>
+
+      <!-- ==========================================
+           1. ACCOUNT DETAILS SECTION (Default View)
+           ========================================== -->
+      <section id="accountDetailsSection" <% if (typeof editMode !== 'undefined' && editMode) { %>style="display: none;"<% } %>>
+        <div class="form-header" style="margin-bottom: 1.5rem;">
+          <h1 class="form-title">Account Details</h1>
+          <p class="form-subtitle">Your personal account credentials & profile overview</p>
+        </div>
+
+        <!-- Avatar & Summary Banner -->
+        <div class="account-overview-box">
+          <div class="account-avatar-wrapper">
+            <img
+              src="<%= (user && user.profileImage) ? user.profileImage : '/images/default-avatar.svg' %>"
+              alt="<%= user ? user.username : 'Profile Avatar' %>"
+              class="account-avatar-large"
+            />
+          </div>
+          <h2 class="account-overview-name"><%= user ? user.username : '' %></h2>
+          <p class="account-overview-email" style="margin-bottom: 0;"><%= user ? user.email : '' %></p>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="account-details-grid">
+          <div class="account-detail-item">
+            <span class="account-detail-label">
+              <span>👤</span> Username
+            </span>
+            <span class="account-detail-value">@<%= user ? user.username : '' %></span>
+          </div>
+
+          <div class="account-detail-item">
+            <span class="account-detail-label">
+              <span>✉️</span> Email Address
+            </span>
+            <span class="account-detail-value"><%= user ? user.email : '' %></span>
+          </div>
+
+          <div class="account-detail-item">
+            <span class="account-detail-label">
+              <span>📅</span> Member Since
+            </span>
+            <span class="account-detail-value">
+              <%= (user && user.createdAt) ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Recently' %>
+            </span>
+          </div>
+
+          <!-- Dark Mode Setting Option -->
+          <div class="account-detail-item theme-preference-item">
+            <span class="account-detail-label">
+              <span id="pageThemeIcon">🌙</span> Dark Mode
+            </span>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span class="account-detail-value" id="pageThemeText" style="font-size: 0.85rem; color: var(--color-text-muted);">On</span>
+              <label class="toggle-switch" title="Toggle Dark Mode On / Off">
+                <input type="checkbox" id="pageThemeCheckbox" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Action: Update Profile Button -->
+        <div class="account-details-actions" style="margin-top: 1.75rem;">
+          <button
+            type="button"
+            id="btnOpenUpdateProfile"
+            class="btn btn-primary"
+            style="width: 100%; padding: 0.85rem; font-size: 1rem;"
+          >
+            ✏️ Update Profile
+          </button>
+        </div>
+
+        <div class="form-footer-link" style="margin-top: 1.25rem;">
+          <a href="/">&larr; Return to Home Feed</a>
+        </div>
+      </section>
+
+
+      <!-- ==========================================
+           2. UPDATE PROFILE SECTION (Shown on Click)
+           ========================================== -->
+      <section id="updateProfileSection" <% if (typeof editMode === 'undefined' || !editMode) { %>style="display: none;"<% } %>>
+        <div class="form-header" style="margin-bottom: 1.5rem;">
+          <div class="auth-brand-badge">✏️</div>
+          <h1 class="form-title">Update Profile</h1>
+          <p class="form-subtitle">Modify your username, email, password, or profile photo</p>
+        </div>
+
+        <form action="/settings" method="POST" enctype="multipart/form-data">
+          <!-- Profile Avatar Section -->
+          <div class="form-group avatar-upload-group">
+            <label class="form-label">Profile Image <span class="badge-optional">(Custom photo or avatar)</span></label>
+
+            <div class="avatar-picker-wrap">
+              <div class="avatar-preview-box">
+                <div class="avatar-preview-container">
+                  <img
+                    id="avatarPreview"
+                    src="<%= (user && user.profileImage) ? user.profileImage : '/images/default-avatar.svg' %>"
+                    alt="Avatar Preview"
+                    class="avatar-preview-img"
+                  />
+                  <button
+                    type="button"
+                    id="btnRemoveAvatar"
+                    class="btn-remove-avatar <%= (user && user.profileImage && user.profileImage.startsWith('/uploads/')) ? 'is-visible' : '' %>"
+                    title="Remove uploaded photo"
+                    aria-label="Remove uploaded photo"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <!-- Interactive Choose Avatar Pill Trigger -->
+                <button
+                  type="button"
+                  id="btnOpenAvatarModal"
+                  class="avatar-select-pill"
+                  title="Click to choose from default avatars"
+                  <% if (user && user.profileImage && user.profileImage.startsWith('/uploads/')) { %>style="display: none;"<% } %>
+                >
+                  <span id="avatarPillText"><%= (user && user.profileImage && user.profileImage.startsWith('/images/avatars/')) ? 'Avatar Selected' : 'Default Avatar' %></span>
+                  <span class="avatar-pill-chevron">▾</span>
+                </button>
+
+                <!-- Custom Photo Badge -->
+                <span
+                  id="customPhotoBadge"
+                  class="avatar-badge-tag is-custom"
+                  <% if (!user || !user.profileImage || !user.profileImage.startsWith('/uploads/')) { %>style="display: none;"<% } %>
+                >
+                  Custom Photo
+                </span>
+              </div>
+
+              <div class="avatar-upload-inputs">
+                <label for="profileImage" class="btn btn-secondary btn-sm file-picker-btn">
+                  📸 Upload Custom Photo
+                </label>
+                <input
+                  type="file"
+                  id="profileImage"
+                  name="profileImage"
+                  accept="image/png, image/jpeg, image/webp, image/gif, image/svg+xml"
+                  class="file-input-hidden"
+                />
+                <span id="fileNameDisplay" class="file-name-hint">
+                  <%= (user && user.profileImage && user.profileImage.startsWith('/uploads/')) ? 'Custom photo uploaded' : 'Select a new photo or avatar' %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Hidden Input for Chosen SVG Avatar -->
+            <input
+              type="hidden"
+              name="selectedAvatar"
+              id="selectedAvatar"
+              value="<%= (user && user.profileImage) ? user.profileImage : '/images/default-avatar.svg' %>"
+            />
+          </div>
+
+          <!-- Username Input -->
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-control"
+              placeholder="e.g., alex_codes"
+              value="<%= user ? user.username : '' %>"
+              required
+              minlength="3"
+              maxlength="30"
+              autocomplete="username"
+            />
+            <div class="form-help">Must be between 3 and 30 characters.</div>
+          </div>
+
+          <!-- Email Input -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder="you@example.com"
+              value="<%= user ? user.email : '' %>"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <!-- Password Input (Optional) -->
+          <div class="form-group">
+            <label for="password" class="form-label">
+              New Password <span class="badge-optional">(Leave blank to keep current)</span>
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder="Enter new password (min. 6 characters)"
+              minlength="6"
+              autocomplete="new-password"
+            />
+            <div class="form-help">Only fill this if you want to change your password.</div>
+          </div>
+
+          <!-- Form Actions Row (Cancel + Save) -->
+          <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+            <button
+              type="button"
+              id="btnCancelUpdateProfile"
+              class="btn btn-secondary"
+              style="flex: 1; padding: 0.85rem;"
+            >
+              ✕ Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              style="flex: 2; padding: 0.85rem; font-size: 1rem;"
+            >
+              Save Changes &rarr;
+            </button>
+          </div>
+        </form>
+
+        <div class="form-footer-link" style="margin-top: 1.25rem;">
+          <a href="#" id="linkReturnToDetails">&larr; Return to Account Details</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- Avatar Selection Popup Modal (Top-level fixed overlay) -->
+<div class="avatar-modal-overlay" id="avatarModal" style="display: none;" role="dialog"
+  aria-modal="true" aria-labelledby="avatarModalTitle">
+  <div class="avatar-modal-card">
+    <div class="avatar-modal-header">
+      <div class="avatar-modal-header-content">
+        <h3 class="avatar-modal-title" id="avatarModalTitle">Choose an Avatar</h3>
+        <p class="avatar-modal-desc">Select an avatar or keep the default silhouette</p>
+      </div>
+      <button type="button" class="avatar-modal-close" id="btnCloseAvatarModal"
+        aria-label="Close avatar picker">✕</button>
+    </div>
+
+    <div class="avatar-modal-grid" id="avatarModalGrid">
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/default-avatar.svg') ? 'is-active' : '' %>" data-avatar="/images/default-avatar.svg" title="Default Silhouette">
+        <img src="/images/default-avatar.svg" alt="Default Silhouette" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-1.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-1.svg" title="Avatar 1">
+        <img src="/images/avatars/face-1.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-2.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-2.svg" title="Avatar 2">
+        <img src="/images/avatars/face-2.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-3.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-3.svg" title="Avatar 3">
+        <img src="/images/avatars/face-3.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-4.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-4.svg" title="Avatar 4">
+        <img src="/images/avatars/face-4.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-5.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-5.svg" title="Avatar 5">
+        <img src="/images/avatars/face-5.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-6.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-6.svg" title="Avatar 6">
+        <img src="/images/avatars/face-6.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-7.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-7.svg" title="Avatar 7">
+        <img src="/images/avatars/face-7.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+      <div class="avatar-option-card <%= (user && user.profileImage === '/images/avatars/face-8.svg') ? 'is-active' : '' %>" data-avatar="/images/avatars/face-8.svg" title="Avatar 8">
+        <img src="/images/avatars/face-8.svg" alt="Avatar option" class="avatar-option-thumb" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    // 1. View Toggle Logic (Account Details <-> Update Profile)
+    const btnOpenUpdateProfile = document.getElementById('btnOpenUpdateProfile');
+    const btnCancelUpdateProfile = document.getElementById('btnCancelUpdateProfile');
+    const linkReturnToDetails = document.getElementById('linkReturnToDetails');
+    const accountDetailsSection = document.getElementById('accountDetailsSection');
+    const updateProfileSection = document.getElementById('updateProfileSection');
+
+    function showUpdateForm() {
+      if (accountDetailsSection) accountDetailsSection.style.display = 'none';
+      if (updateProfileSection) updateProfileSection.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showAccountDetails() {
+      if (updateProfileSection) updateProfileSection.style.display = 'none';
+      if (accountDetailsSection) accountDetailsSection.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    if (btnOpenUpdateProfile) {
+      btnOpenUpdateProfile.addEventListener('click', showUpdateForm);
+    }
+    if (btnCancelUpdateProfile) {
+      btnCancelUpdateProfile.addEventListener('click', showAccountDetails);
+    }
+    if (linkReturnToDetails) {
+      linkReturnToDetails.addEventListener('click', function (e) {
+        e.preventDefault();
+        showAccountDetails();
+      });
+    }
+
+    // 2. Avatar Picker & Upload Handlers
+    function setupSettingsAvatarPicker() {
+      const fileInput = document.getElementById('profileImage');
+      const previewImg = document.getElementById('avatarPreview');
+      const fileNameDisplay = document.getElementById('fileNameDisplay');
+      const btnRemoveAvatar = document.getElementById('btnRemoveAvatar');
+      const btnOpenAvatarModal = document.getElementById('btnOpenAvatarModal');
+      const avatarPillText = document.getElementById('avatarPillText');
+      const customPhotoBadge = document.getElementById('customPhotoBadge');
+      const selectedAvatarInput = document.getElementById('selectedAvatar');
+      const avatarModal = document.getElementById('avatarModal');
+      const btnCloseAvatarModal = document.getElementById('btnCloseAvatarModal');
+      const avatarOptionCards = document.querySelectorAll('.avatar-option-card');
+
+      if (!avatarModal || !btnOpenAvatarModal) return;
+
+      let currentSvgAvatar = (selectedAvatarInput && selectedAvatarInput.value) || '/images/default-avatar.svg';
+
+      function openModal() {
+        avatarModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        avatarModal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      btnOpenAvatarModal.addEventListener('click', openModal);
+      if (previewImg) {
+        previewImg.addEventListener('click', function () {
+          if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            openModal();
+          }
+        });
+      }
+      if (btnCloseAvatarModal) {
+        btnCloseAvatarModal.addEventListener('click', closeModal);
+      }
+      avatarModal.addEventListener('click', function (e) {
+        if (e.target === avatarModal) {
+          closeModal();
+        }
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && avatarModal.style.display === 'flex') {
+          closeModal();
+        }
+      });
+
+      // Selection Handler
+      avatarOptionCards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          const chosenAvatar = this.dataset.avatar;
+          currentSvgAvatar = chosenAvatar;
+          if (selectedAvatarInput) selectedAvatarInput.value = chosenAvatar;
+          if (previewImg) previewImg.src = chosenAvatar;
+          if (fileNameDisplay) fileNameDisplay.textContent = 'Avatar selected';
+          if (avatarPillText) {
+            avatarPillText.textContent = (chosenAvatar === '/images/default-avatar.svg') ? 'Default Avatar' : 'Avatar Selected';
+          }
+
+          avatarOptionCards.forEach(function (c) {
+            c.classList.remove('is-active');
+          });
+          this.classList.add('is-active');
+
+          closeModal();
+        });
+      });
+
+      // Remove Custom Photo
+      function removeCustomPhoto() {
+        if (fileInput) fileInput.value = '';
+        if (btnRemoveAvatar) btnRemoveAvatar.classList.remove('is-visible');
+        if (customPhotoBadge) customPhotoBadge.style.display = 'none';
+        if (btnOpenAvatarModal) btnOpenAvatarModal.style.display = 'inline-flex';
+
+        currentSvgAvatar = '/images/default-avatar.svg';
+        if (selectedAvatarInput) selectedAvatarInput.value = currentSvgAvatar;
+        if (previewImg) previewImg.src = currentSvgAvatar;
+        if (fileNameDisplay) fileNameDisplay.textContent = 'Using default silhouette';
+        if (avatarPillText) avatarPillText.textContent = 'Default Avatar';
+
+        avatarOptionCards.forEach(function (c) {
+          c.classList.remove('is-active');
+        });
+        const defaultCard = document.querySelector('[data-avatar="/images/default-avatar.svg"]');
+        if (defaultCard) defaultCard.classList.add('is-active');
+      }
+
+      // Custom Photo Upload Handler
+      if (fileInput) {
+        fileInput.addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const sizeKB = (file.size / 1024).toFixed(1);
+            if (fileNameDisplay) fileNameDisplay.textContent = file.name + ' (' + sizeKB + ' KB)';
+            if (btnRemoveAvatar) btnRemoveAvatar.classList.add('is-visible');
+            if (btnOpenAvatarModal) btnOpenAvatarModal.style.display = 'none';
+            if (customPhotoBadge) customPhotoBadge.style.display = 'inline-flex';
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              if (previewImg) previewImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+          } else {
+            removeCustomPhoto();
+          }
+        });
+      }
+
+      if (btnRemoveAvatar) {
+        btnRemoveAvatar.addEventListener('click', removeCustomPhoto);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupSettingsAvatarPicker);
+    } else {
+      setupSettingsAvatarPicker();
+    }
+  })();
+</script>
+
+<%- include('../partials/footer') %>

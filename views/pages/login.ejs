@@ -1,0 +1,93 @@
+<%- include('../partials/header', { title: 'Log In' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content container">
+  <div class="auth-wrapper">
+    <div class="form-card">
+      <div class="form-header">
+        <div class="auth-brand-badge">✦</div>
+        <h1 class="form-title">Welcome Back</h1>
+        <p class="form-subtitle">Enter your credentials to access your Blog_Xp account</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <% if (typeof query !== 'undefined' && query.logout === 'success') { %>
+        <div class="alert alert-success flash-alert" id="logoutAlert" role="alert">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span>✓</span>
+            <span>You have been logged out successfully.</span>
+          </div>
+          <button type="button" class="alert-dismiss-btn" onclick="dismissLogoutAlert()" aria-label="Dismiss notification">✕</button>
+        </div>
+
+        <script>
+          (function() {
+            if (window.history && window.history.replaceState) {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('logout');
+              const cleanUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '');
+              window.history.replaceState({}, document.title, cleanUrl);
+            }
+
+            window.dismissLogoutAlert = function() {
+              const alertEl = document.getElementById('logoutAlert');
+              if (alertEl) {
+                alertEl.classList.add('is-hiding');
+                setTimeout(function() {
+                  if (alertEl && alertEl.parentNode) {
+                    alertEl.parentNode.removeChild(alertEl);
+                  }
+                }, 350);
+              }
+            };
+          })();
+        </script>
+      <% } %>
+
+      <form action="/auth/login" method="POST">
+        <!-- Email Input -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            placeholder="you@example.com"
+            value="<%= typeof email !== 'undefined' ? email : '' %>"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.75rem; padding: 0.8rem; font-size: 1rem;">
+          Sign In &rarr;
+        </button>
+      </form>
+
+      <div class="form-footer-link">
+        Don't have an account yet? <a href="/auth/signup"><strong>Sign up for free</strong></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

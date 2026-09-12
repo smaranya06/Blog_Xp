@@ -1,0 +1,290 @@
+<%- include('../partials/header', { title: 'Home - Latest Stories' }) %>
+<%- include('../partials/navbar') %>
+
+<main class="main-content container">
+  <!-- Notifications & Status Banners -->
+  <% if (typeof query !== 'undefined' && (query.login === 'success' || query.welcome === 'true' || query.deleted === 'true')) { %>
+    <div class="alert alert-success flash-alert" id="flashAlert" role="alert">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span>✓</span>
+        <span>
+          <% if (query.login === 'success') { %>
+            Welcome back! You have logged in successfully.
+          <% } else if (query.welcome === 'true') { %>
+            Account registered successfully! Welcome to Blog_Xp.
+          <% } else if (query.deleted === 'true') { %>
+            Blog post was deleted successfully.
+          <% } %>
+        </span>
+      </div>
+      <button type="button" class="alert-dismiss-btn" onclick="dismissFlashAlert()" aria-label="Dismiss notification">✕</button>
+    </div>
+
+    <script>
+      (function() {
+        // Immediately remove status params from browser address bar so refreshing the page will never re-trigger the message
+        if (window.history && window.history.replaceState) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('login');
+          url.searchParams.delete('welcome');
+          url.searchParams.delete('deleted');
+          const cleanUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '');
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+
+        window.dismissFlashAlert = function() {
+          const alertEl = document.getElementById('flashAlert');
+          if (alertEl) {
+            alertEl.classList.add('is-hiding');
+            setTimeout(function() {
+              if (alertEl && alertEl.parentNode) {
+                alertEl.parentNode.removeChild(alertEl);
+              }
+            }, 350);
+          }
+        };
+      })();
+    </script>
+  <% } %>
+
+  <!-- Cool Hero Header -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>✨</span> The Modern Developer & Story Journal
+    </div>
+    <h1 class="hero-title">Ideas, Insights & Perspectives</h1>
+    <p class="hero-subtitle">
+      A sleek creative space for developers, designers, and thinkers to write, discover thoughts, and share ideas.
+    </p>
+
+    <!-- Glowing Search Bar -->
+    <form action="/" method="GET" class="search-form">
+      <input
+        type="text"
+        name="search"
+        class="search-input"
+        placeholder="Search stories by topic, title, or @username..."
+        value="<%= typeof search !== 'undefined' ? search : '' %>"
+      />
+      <button type="submit" class="btn btn-primary">Search</button>
+      <% if (typeof search !== 'undefined' && search || typeof tag !== 'undefined' && tag) { %>
+        <a href="/" class="btn btn-secondary">Clear</a>
+      <% } %>
+    </form>
+  </section>
+
+  <!-- Feed Filter Bar -->
+  <div class="filter-bar">
+    <h2 class="filter-heading">
+      <% if (typeof tag !== 'undefined' && tag) { %>
+        <span>Articles tagged with</span>
+        <span class="tag-badge" style="font-size: 0.95rem;">#<%= tag %></span>
+      <% } else if (typeof search !== 'undefined' && search) { %>
+        <% if (search.trim().startsWith('@')) { %>
+          <span>Stories by Author</span>
+          <span class="tag-badge" style="font-size: 0.95rem;"><%= search.trim() %></span>
+        <% } else { %>
+          <span>Search results for "<%= search %>"</span>
+        <% } %>
+      <% } else { %>
+        <span>Featured Stories</span>
+      <% } %>
+    </h2>
+    <span id="visiblePublicationsCount" style="font-size: 0.9rem; color: var(--color-text-subtle); font-weight: 500;">
+      <% if (blogs.length <= 8) { %>
+        Showing <%= blogs.length %> <%= blogs.length === 1 ? 'publication' : 'publications' %>
+      <% } else { %>
+        Showing 8 of <%= blogs.length %> publications
+      <% } %>
+    </span>
+  </div>
+
+  <!-- Blog Cards Grid (4*2 initial slots, with progressive reveal for subsequent slots) -->
+  <% if (blogs && blogs.length > 0) { %>
+    <div class="blog-grid" id="mainBlogGrid">
+      <% blogs.forEach(function(blog, index) { %>
+        <% const hasMedia = blog.mediaUrl && blog.mediaType && blog.mediaType !== 'none' && String(blog.mediaUrl).trim() !== ''; %>
+        <% 
+          let batchClass = '';
+          let isHidden = false;
+          if (index >= 8 && index < 100) {
+            batchClass = 'blog-card-hidden batch-1';
+            isHidden = true;
+          } else if (index >= 100) {
+            const batchNum = Math.floor((index - 100) / 100) + 2;
+            batchClass = 'blog-card-hidden batch-' + batchNum;
+            isHidden = true;
+          }
+        %>
+        <article
+          class="blog-card <%= batchClass %> <%= hasMedia ? 'has-media' : 'no-media' %>"
+          data-index="<%= index %>"
+          <% if (isHidden) { %>style="display: none;"<% } %>
+        >
+          <% if (hasMedia) { %>
+            <div class="blog-card-media-wrap">
+              <a href="/blogs/<%= blog._id %>" class="blog-card-media-link" tabindex="-1" aria-label="View <%= blog.title %>">
+                <% if (blog.mediaType === 'video') { %>
+                  <div class="blog-card-video-thumb">
+                    <video src="<%= blog.mediaUrl %>" muted preload="metadata" class="blog-card-media-video"></video>
+                    <span class="video-play-indicator">▶ Video</span>
+                  </div>
+                <% } else { %>
+                  <img src="<%= blog.mediaUrl %>" alt="<%= blog.title %>" class="blog-card-media-img" loading="lazy" />
+                <% } %>
+              </a>
+            </div>
+          <% } %>
+
+          <div class="blog-card-meta">
+            <div class="blog-card-author">
+              <img
+                src="<%= (blog.author && blog.author.profileImage) ? blog.author.profileImage : '/images/default-avatar.svg' %>"
+                alt="<%= blog.author ? blog.author.username : 'Author' %>"
+                class="author-avatar-sm"
+                loading="lazy"
+              />
+              <a href="/?search=@<%= blog.author ? blog.author.username : '' %>" class="author-name" title="View all publications by @<%= blog.author ? blog.author.username : 'community' %>">
+                @<%= blog.author ? blog.author.username : 'community' %>
+              </a>
+            </div>
+            <span>&bull;</span>
+            <time datetime="<%= blog.createdAt %>">
+              <%= new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+            </time>
+          </div>
+
+          <h3 class="blog-card-title">
+            <a href="/blogs/<%= blog._id %>"><%= blog.title %></a>
+          </h3>
+
+          <p class="blog-card-snippet">
+            <%= blog.snippet || (blog.content.length > 140 ? blog.content.substring(0, 140) + '...' : blog.content) %>
+          </p>
+
+          <% if (blog.tags && blog.tags.length > 0) { %>
+            <div class="blog-card-tags">
+              <% blog.tags.forEach(function(tagItem) { %>
+                <a href="/?tag=<%= encodeURIComponent(tagItem) %>" class="tag-badge">#<%= tagItem %></a>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <div class="blog-card-footer">
+            <a href="/blogs/<%= blog._id %>" class="read-more-link">Read Story &rarr;</a>
+          </div>
+        </article>
+      <% }); %>
+    </div>
+
+    <!-- 1. Initial See More (at the bottom of the 4*2 section to show up to 100 blogs) -->
+    <% if (blogs.length > 8) { %>
+      <div class="see-more-section" id="seeMoreInitialWrap">
+        <button type="button" class="btn-see-more" id="btnSeeMoreInitial" onclick="revealInitialBatch()">
+          <span class="see-more-icon">↓</span>
+          <span class="see-more-title">See More</span>
+        </button>
+      </div>
+    <% } %>
+
+    <!-- 2. Subsequent See More (shown after 100 blogs in the end) -->
+    <% if (blogs.length > 100) { %>
+      <div class="see-more-section" id="seeMoreEndWrap" style="display: none;">
+        <button type="button" class="btn-see-more" id="btnSeeMoreEnd" onclick="revealNextHundredBatch()">
+          <span class="see-more-icon">↓</span>
+          <span class="see-more-title">See More</span>
+        </button>
+      </div>
+    <% } %>
+
+    <script>
+      (function() {
+        const totalBlogs = document.querySelectorAll('.blog-card').length;
+        let currentVisibleCount = Math.min(totalBlogs, 8);
+        let currentBatchNum = 1;
+
+        function updateCountDisplay() {
+          const countEl = document.getElementById('visiblePublicationsCount');
+          if (countEl) {
+            if (totalBlogs <= 8) {
+              countEl.textContent = 'Showing ' + totalBlogs + (totalBlogs === 1 ? ' publication' : ' publications');
+            } else if (currentVisibleCount < totalBlogs) {
+              countEl.textContent = 'Showing ' + currentVisibleCount + ' of ' + totalBlogs + ' publications';
+            } else {
+              countEl.textContent = 'Showing all ' + totalBlogs + ' publications';
+            }
+          }
+        }
+
+        window.revealInitialBatch = function() {
+          const batch1Cards = document.querySelectorAll('.batch-1');
+          batch1Cards.forEach(function(card) {
+            card.style.display = 'flex';
+            card.classList.remove('blog-card-hidden');
+            card.classList.add('blog-card-revealed');
+          });
+
+          const initialWrap = document.getElementById('seeMoreInitialWrap');
+          if (initialWrap) initialWrap.style.display = 'none';
+
+          currentVisibleCount = Math.min(totalBlogs, 100);
+          updateCountDisplay();
+
+          if (totalBlogs > 100) {
+            const endWrap = document.getElementById('seeMoreEndWrap');
+            if (endWrap) {
+              endWrap.style.display = 'flex';
+            }
+          }
+
+          if (batch1Cards.length > 0) {
+            batch1Cards[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        };
+
+        window.revealNextHundredBatch = function() {
+          currentBatchNum++;
+          const nextBatchCards = document.querySelectorAll('.batch-' + currentBatchNum);
+          nextBatchCards.forEach(function(card) {
+            card.style.display = 'flex';
+            card.classList.remove('blog-card-hidden');
+            card.classList.add('blog-card-revealed');
+          });
+
+          currentVisibleCount = Math.min(totalBlogs, 100 * currentBatchNum);
+          updateCountDisplay();
+
+          const remaining = totalBlogs - currentVisibleCount;
+          const endWrap = document.getElementById('seeMoreEndWrap');
+          if (remaining <= 0) {
+            if (endWrap) endWrap.style.display = 'none';
+          }
+
+          if (nextBatchCards.length > 0) {
+            nextBatchCards[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        };
+      })();
+    </script>
+  <% } else { %>
+    <!-- Empty Feed State -->
+    <div class="empty-state">
+      <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🖋️</div>
+      <h3 class="empty-state-title">No blog articles found</h3>
+      <p class="empty-state-desc">
+        <% if (typeof search !== 'undefined' && search || typeof tag !== 'undefined' && tag) { %>
+          Try searching for another keyword or clear the tag filter to see all posts.
+        <% } else { %>
+          Be the pioneer! Share the very first perspective with our growing reader community.
+        <% } %>
+      </p>
+      <% if (typeof user !== 'undefined' && user) { %>
+        <a href="/blogs/create" class="btn btn-primary">+ Write the First Post</a>
+      <% } else { %>
+        <a href="/auth/signup" class="btn btn-primary">Join & Start Writing</a>
+      <% } %>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

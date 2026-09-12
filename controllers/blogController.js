@@ -7,6 +7,7 @@
 
 const mongoose = require('mongoose');
 const Blog = require('../models/Blog');
+const User = require('../models/User');
 
 /**
  * Retrieves a list of blog posts with optional keyword search and tag filtering.
@@ -26,12 +27,28 @@ const getAllBlogs = async (req, res) => {
     const { search, tag } = req.query;
     const filter = {};
 
-    // Case-insensitive regex search over title and body content
+    // Case-insensitive regex search over title, body content, and author username
     if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
+      const cleanSearch = search.trim();
+      const escapedSearch = cleanSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const authorQuery = cleanSearch.replace(/^@/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const matchingUsers = await User.find(
+        { username: { $regex: authorQuery, $options: 'i' } },
+        '_id'
+      );
+      const userIds = matchingUsers.map((u) => u._id);
+
+      const orConditions = [
+        { title: { $regex: escapedSearch, $options: 'i' } },
+        { content: { $regex: escapedSearch, $options: 'i' } },
       ];
+
+      if (userIds.length > 0) {
+        orConditions.push({ author: { $in: userIds } });
+      }
+
+      filter.$or = orConditions;
     }
 
     // Exact match filter for tags
@@ -40,7 +57,7 @@ const getAllBlogs = async (req, res) => {
     }
 
     const blogs = await Blog.find(filter)
-      .populate('author', 'username email')
+      .populate('author', 'username email profileImage')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -80,7 +97,7 @@ const getBlogById = async (req, res) => {
       });
     }
 
-    const blog = await Blog.findById(id).populate('author', 'username email');
+    const blog = await Blog.findById(id).populate('author', 'username email profileImage');
 
     if (!blog) {
       return res.status(404).json({
