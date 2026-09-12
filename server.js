@@ -117,12 +117,7 @@ const getLocalNetworkIp = () => {
 // Start HTTP Listener bound to all network interfaces (0.0.0.0)
 const server = app.listen(PORT, HOST, () => {
   const networkIp = getLocalNetworkIp();
-  console.log(`\n======================================================`);
-  console.log(`[Blog_Xp Server] Running in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`  ➜ Local:   http://localhost:${PORT}`);
-  console.log(`  ➜ Network: http://${networkIp}:${PORT}`);
-  console.log(`  ➜ Mobile:  Open http://${networkIp}:${PORT} on your phone`);
-  console.log(`======================================================\n`);
+  console.log(`Server Running in ${process.env.NODE_ENV || 'development'} mode`);
 });
 
 module.exports = { app, server };
